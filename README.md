@@ -11,6 +11,6 @@ Web/mobile app that will allow users to add songs through Spotify premium to a s
 7. Host ends session.
 
 Optional:
-8. Provide recommended playlists based on people in listening room.
-9. Private/public feature. Private: listen remotely to shared playlist. Public: use in context of social gathering.
+8. Provide recommended playlists based on people in listening room.\
+9. Private/public feature. Private: listen remotely to shared playlist. Public: use in context of social gathering.\
 10. "Winner" for top music recommender. Points system. 
