@@ -44,7 +44,8 @@ class App extends Component {
       })
   }
   updatePlaylist() {
-
+    let name = prompt("What's the name of the song you are adding?", "");
+    
   }
   render() {
 
