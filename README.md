@@ -19,7 +19,7 @@ Web/mobile app that will allow users to add songs through Spotify premium to a s
 
 ### Run Instructions:
 
-Step one: Open up terminal and cd into root directory and run 'npm install' in terminal.
-Step two: Now cd into auth-server and run 'node authorization_code/app.js'
-Step three: Open up another terminal tab, cd back into the project directory, and run 'npm start'
-Step four: Visit localhost:3000 and the app should be running! Add songs to the playlist.
+1. Open up terminal and cd into root directory and run 'npm install' in terminal.
+2. Now cd into auth-server and run 'node authorization_code/app.js'
+3. Open up another terminal tab, cd back into the project directory, and run 'npm start'
+4. Visit localhost:3000 and the app should be running! Add songs to the playlist.
