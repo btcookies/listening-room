@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
+import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import './App.css';
 import Spotify from 'spotify-web-api-js';
+import $ from 'jquery';
 
 const spotifyWebApi = new Spotify();
 
@@ -14,9 +16,14 @@ class App extends Component {
         name: 'Not Checked',
         image: ''
       },
-      curPlaylist: {
-        name: 'No Current Playlist',
-        songs: 'unknown'
+      playlist: {
+        name: 'Current Playlist',
+        content: [{"songName": "Crew",
+                   "url": "https://open.spotify.com/track/3jEtESxn2ngF25DMD6vbBg?si=omRx4yCdSI2oHjItqbfACw"},
+                  {"songName": "Lost In Japan",
+                   "url": "https://open.spotify.com/track/6WBTeFDEfAJbaSUUc1V1xQ?si=oFCUXZYBSX-5xRfhMu5KTA"},
+                  {"songName": "1999 WILDFIRE",
+                   "url": "https://open.spotify.com/track/1t4pPnbkOjzoA5RvsDjvUU?si=utREqrTmTVum9kKuAQQz0g"}]
       },
     };
     if (params.access_token) {
@@ -43,27 +50,54 @@ class App extends Component {
         })
       })
   }
+
   updatePlaylist() {
-    let name = prompt("What's the name of the song you are adding?", "");
-    
+    const name = prompt("What's the name of the song you are adding?", "<insert title here>");
+    const code = prompt("Copy and paste the Song Link from Spotify into this field", "<insert code here>");
+    let canContinue = name !== "<insert title here>" && code !== "<insert code here>" ? true : false;
+
+    // jquery call to get HTML object from string
+    //
+    // REVISIT THIS TO SEE IF WE CAN GET COOL EMBEDDED PLAYLIST
+    //
+    // const embedHTML = $(code);
+
+
+    if (!canContinue) {
+      alert("Sorry, you've entered invalid input[s]. Please try again.");
+    } else {
+      console.log("This is the name value stored: " + name + "\n");
+      console.log("This is the embed code stored: " + code + "\n");
+      this.setState({
+        playlist: {
+          content: [...this.state.playlist.content, {"songName": name, "url": code}]
+        }
+      });
+      console.log(this.state.playlist.content);
+    }
   }
   render() {
 
-    const playlist = [{"songName": "Crew",
-                       "embed": <iframe src="https://open.spotify.com/embed/track/15EPc80XuFrb2LmOzGjuRg"
-                                        width="300" height="380" frameborder="0"
-                                        allowtransparency="true" allow="encrypted-media"></iframe>},
-                      {"songName": "Lost In Japan",
-                       "embed": <iframe src="https://open.spotify.com/embed/track/79esEXlqqmq0GPz0xQSZTV"
-                                        width="300" height="380" frameborder="0"
-                                        allowtransparency="true" allow="encrypted-media"></iframe>},
-                      {"songName": "1999 WILDFIRE",
-                       "embed": <iframe src="https://open.spotify.com/embed/track/1t4pPnbkOjzoA5RvsDjvUU"
-                                        width="300" height="380" frameborder="0"
-                                        allowtransparency="true" allow="encrypted-media"></iframe>}
-
-                      ];
-    const listSongs = playlist.map((song) => <li key={song.name}>{song.embed}</li>);
+    // const playlist = [{"songName": "Crew",
+    //                    "embed": <iframe src="https://open.spotify.com/embed/track/15EPc80XuFrb2LmOzGjuRg"
+    //                                     width="300" height="380" frameborder="0"
+    //                                     allowtransparency="true" allow="encrypted-media"></iframe>},
+    //                   {"songName": "Lost In Japan",
+    //                    "embed": <iframe src="https://open.spotify.com/embed/track/79esEXlqqmq0GPz0xQSZTV"
+    //                                     width="300" height="380" frameborder="0"
+    //                                     allowtransparency="true" allow="encrypted-media"></iframe>},
+    //                   {"songName": "1999 WILDFIRE",
+    //                    "embed": <iframe src="https://open.spotify.com/embed/track/1t4pPnbkOjzoA5RvsDjvUU"
+    //                                     width="300" height="380" frameborder="0"
+    //                                     allowtransparency="true" allow="encrypted-media"></iframe>}
+    //
+    //                   ];
+    let listSongs = this.state.playlist.content.map((song) =>
+        <Router key={song.songName}>
+          <li>
+            <a href={song.url}> { song.songName }</a>
+          </li>
+        </Router>);
 
     return (
       <div className="App">
@@ -80,6 +114,11 @@ class App extends Component {
         <div>
         Playlist:
         { listSongs }
+        </div>
+        <div>
+        <button onClick={() => this.updatePlaylist()}>
+          Add To Playlist
+        </button>
         </div>
       </div>
     );
