@@ -54,7 +54,7 @@ class App extends Component {
   updatePlaylist() {
     const name = prompt("What's the name of the song you are adding?", "<insert title here>");
     const code = prompt("Copy and paste the Song Link from Spotify into this field", "<insert code here>");
-    let canContinue = name !== "<insert title here>" && code !== "<insert code here>" ? true : false;
+    let canContinue = name !== null && code !== null ? true : false;
 
     // jquery call to get HTML object from string
     //
