@@ -13,8 +13,12 @@ class App extends Component {
       nowPlaying: {
         name: 'Not Checked',
         image: ''
-      }
-    }
+      },
+      curPlaylist: {
+        name: 'No Current Playlist',
+        songs: 'unknown'
+      },
+    };
     if (params.access_token) {
       spotifyWebApi.setAccessToken(params.access_token);
     }
@@ -39,7 +43,27 @@ class App extends Component {
         })
       })
   }
+  updatePlaylist() {
+
+  }
   render() {
+
+    const playlist = [{"songName": "Crew",
+                       "embed": <iframe src="https://open.spotify.com/embed/track/15EPc80XuFrb2LmOzGjuRg"
+                                        width="300" height="380" frameborder="0"
+                                        allowtransparency="true" allow="encrypted-media"></iframe>},
+                      {"songName": "Lost In Japan",
+                       "embed": <iframe src="https://open.spotify.com/embed/track/79esEXlqqmq0GPz0xQSZTV"
+                                        width="300" height="380" frameborder="0"
+                                        allowtransparency="true" allow="encrypted-media"></iframe>},
+                      {"songName": "1999 WILDFIRE",
+                       "embed": <iframe src="https://open.spotify.com/embed/track/1t4pPnbkOjzoA5RvsDjvUU"
+                                        width="300" height="380" frameborder="0"
+                                        allowtransparency="true" allow="encrypted-media"></iframe>}
+
+                      ];
+    const listSongs = playlist.map((song) => <li key={song.name}>{song.embed}</li>);
+
     return (
       <div className="App">
         <a href='http://localhost:8888'>
@@ -52,6 +76,10 @@ class App extends Component {
         <button onClick={() => this.getNowPlaying()}>
           Check Now Playing
         </button>
+        <div>
+        Playlist:
+        { listSongs }
+        </div>
       </div>
     );
   }
