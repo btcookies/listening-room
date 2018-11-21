@@ -16,3 +16,10 @@ Web/mobile app that will allow users to add songs through Spotify premium to a s
 8. Provide recommended playlists based on people in listening room.
 9. Private/public feature. Private: listen remotely to shared playlist. Public: use in context of social gathering.
 10. "Winner" for top music recommender. Points system. 
+
+### Run Instructions:
+
+Step one: Open up terminal and cd into root directory and run 'npm install' in terminal.
+Step two: Now cd into auth-server and run 'node authorization_code/app.js'
+Step three: Open up another terminal tab, cd back into the project directory, and run 'npm start'
+Step four: Visit localhost:3000 and the app should be running! Add songs to the playlist.
