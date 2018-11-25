@@ -9,8 +9,9 @@
 
 var request = require('request'); // "Request" library
 
-var client_id = 'CLIENT_ID'; // Your client id
-var client_secret = 'CLIENT_SECRET'; // Your secret
+var client_id = 7b29a38cd7de4fe3869885aded19bcaf; // Your client id
+var client_secret = d7baa49cf6574e20a6f4447fc0738462; // Your secret
+var redirect_uri = http:localhost:3000/callback
 
 // your application requests authorization
 var authOptions = {

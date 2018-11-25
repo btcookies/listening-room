@@ -4,7 +4,10 @@ import './App.css';
 import Spotify from 'spotify-web-api-js';
 import $ from 'jquery';
 
+
 const spotifyWebApi = new Spotify();
+
+
 
 class App extends Component {
   constructor(){
@@ -98,6 +101,97 @@ class App extends Component {
             <a href={song.url}> { song.songName }</a>
           </li>
         </Router>);
+
+        /**
+           * Fetches a specific playlist.
+           * See [Get a Playlist](https://developer.spotify.com/web-api/get-playlist/) on
+           * the Spotify Developer site for more information about the endpoint.
+           *
+           * @param {string} playlistId The id of the playlist. If you know the Spotify URI it is easy
+           * to find the playlist id (e.g. spotify:user:xxxx:playlist:<here_is_the_playlist_id>)
+           * @param {Object} options A JSON object with options that can be passed
+           * @param {function(Object,Object)} callback An optional callback that receives 2 parameters. The first
+           * one is the error object (null if no error), and the second is the value if the request succeeded.
+           * @return {Object} Null if a callback is provided, a `Promise` object otherwise
+           */
+          Constr.prototype.getPlaylist = function(playlistId, options, callback) {
+            var requestData = {
+              url: _baseUri + '/playlists/' + playlistId
+            };
+            return _checkParamsAndPerformRequest(requestData, options, callback);
+          };
+
+          /**
+           * Fetches the tracks from a specific playlist.
+           * See [Get a Playlist's Tracks](https://developer.spotify.com/web-api/get-playlists-tracks/) on
+           * the Spotify Developer site for more information about the endpoint.
+           *
+           * @param {string} playlistId The id of the playlist. If you know the Spotify URI it is easy
+           * to find the playlist id (e.g. spotify:user:xxxx:playlist:<here_is_the_playlist_id>)
+           * @param {Object} options A JSON object with options that can be passed
+           * @param {function(Object,Object)} callback An optional callback that receives 2 parameters. The first
+           * one is the error object (null if no error), and the second is the value if the request succeeded.
+           * @return {Object} Null if a callback is provided, a `Promise` object otherwise
+           */
+          Constr.prototype.getPlaylistTracks = function(playlistId, options, callback) {
+            var requestData = {
+              url: _baseUri + '/playlists/' + playlistId + '/tracks'
+            };
+            return _checkParamsAndPerformRequest(requestData, options, callback);
+          };
+
+          /**
+            * Add tracks to a playlist.
+            * See [Add Tracks to a Playlist](https://developer.spotify.com/web-api/add-tracks-to-playlist/) on
+            * the Spotify Developer site for more information about the endpoint.
+            *
+            * @param {string} playlistId The id of the playlist. If you know the Spotify URI it is easy
+            * to find the playlist id (e.g. spotify:user:xxxx:playlist:<here_is_the_playlist_id>)
+            * @param {Array<string>} uris An array of Spotify URIs for the tracks
+            * @param {Object} options A JSON object with options that can be passed
+            * @param {function(Object,Object)} callback An optional callback that receives 2 parameters. The first
+            * one is the error object (null if no error), and the second is the value if the request succeeded.
+            * @return {Object} Null if a callback is provided, a `Promise` object otherwise
+            */
+           Constr.prototype.addTracksToPlaylist = function(playlistId, uris, options, callback) {
+             var requestData = {
+               url: _baseUri + '/playlists/' + playlistId + '/tracks',
+               type: 'POST',
+               postData: {
+                 uris: uris
+               }
+             };
+             return _checkParamsAndPerformRequest(requestData, options, callback, true);
+           };
+
+           /**
+ * Reorder tracks in a playlist
+ * See [Reorder a Playlist’s Tracks](https://developer.spotify.com/web-api/reorder-playlists-tracks/) on
+ * the Spotify Developer site for more information about the endpoint.
+ *
+ * @param {string} playlistId The id of the playlist. If you know the Spotify URI it is easy
+ * to find the playlist id (e.g. spotify:user:xxxx:playlist:<here_is_the_playlist_id>)
+ * @param {number} rangeStart The position of the first track to be reordered.
+ * @param {number} insertBefore The position where the tracks should be inserted. To reorder the tracks to
+ * the end of the playlist, simply set insert_before to the position after the last track.
+ * @param {Object} options An object with optional parameters (range_length, snapshot_id)
+ * @param {function(Object,Object)} callback An optional callback that receives 2 parameters. The first
+ * one is the error object (null if no error), and the second is the value if the request succeeded.
+ * @return {Object} Null if a callback is provided, a `Promise` object otherwise
+ */
+Constr.prototype.reorderTracksInPlaylist = function(playlistId, rangeStart, insertBefore, options, callback) {
+  /* eslint-disable camelcase */
+  var requestData = {
+    url: _baseUri + '/playlists/' + playlistId + '/tracks',
+    type: 'PUT',
+    postData: {
+      range_start: rangeStart,
+      insert_before: insertBefore
+    }
+  };
+  /* eslint-enable camelcase */
+  return _checkParamsAndPerformRequest(requestData, options, callback);
+};
 
     return (
       <div className="App">
