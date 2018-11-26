@@ -17,7 +17,10 @@ class App extends Component {
         name: 'Not Checked',
         image: ''
       },
-      playlist: []
+      playlist: {
+        id: "0NXu9CZfJUBbXnd5SE9EJW",
+        content: []
+      }
     };
     if (params.access_token) {
       spotifyWebApi.setAccessToken(params.access_token);
@@ -50,25 +53,52 @@ class App extends Component {
   }
 
   // getting list of tracks in a playlist using spotifyWebApi
-  getPlaylistTracksAPI() {
-    this.setState({playlist: []});
-    spotifyWebApi.getPlaylistTracks("5tx4WPl98jpQUZ6X19S1Wo")
+  getSongs() {
+    const playlistURI = this.state.playlist.id;
+    this.setState({playlist: { id: playlistURI, content: []}});
+    spotifyWebApi.getPlaylistTracks(playlistURI)
       .then((response) => {
         response.items.map((object) =>
           this.setState({
-            playlist:
-            [...this.state.playlist,
-              {"songName": object.track.name,
-              "url": object.track.external_urls.spotify,
-              votes: 0}]
+            playlist: {
+              id: playlistURI,
+              content:
+                [...this.state.playlist.content,
+                {"songName": object.track.name,
+                "url": object.track.external_urls.spotify,
+                votes: 0}]
+            }
           }))
-
       })
+  }
+
+  // adds song to playlist identified in the this.state.playlist.id field
+  addSong() {
+    const songURI = prompt("What song would you like to add? Paste the uri here.", "");
+    if (songURI === null) {
+      alert("Sorry, you did not input a valid uri. Please try again.");
+    } else {
+      console.log("Grabbed song uri: " + songURI);
+      spotifyWebApi.addTracksToPlaylist(this.state.playlist.id, [songURI])
+      .then((object) => console.log(object)/* do nothing*/)
+    }
+  }
+
+  // removes song from playlist identified in the this.state.playlist.id field
+  removeSong() {
+    const songURI = prompt("What song would you like to remove? Paste the uri here.", "");
+    if (songURI === null) {
+      alert("Sorry, you did not input a valid uri. Please try again.");
+    } else {
+      console.log("Grabbed song uri: " + songURI);
+      spotifyWebApi.removeTracksFromPlaylist(this.state.playlist.id, [songURI])
+      .then((object) => console.log(object)/* do nothing*/)
+    }
   }
 
   // set refresh time for 1 second to keep playlist updated
   componentDidMount() {
-    this.interval = setInterval(() => this.getPlaylistTracksAPI(), 1000);
+    this.interval = setInterval(() => this.getSongs(), 1000);
   }
 
   componentWillUnmount() {
@@ -77,10 +107,13 @@ class App extends Component {
 
   render() {
 
-    let listSongs = this.state.playlist.map((song) =>
+    let listSongs = this.state.playlist.content.map((song) =>
         <Router key={song.songName}>
           <li>
             <a href={song.url}> { song.songName }</a>
+            <button>
+              upvote
+            </button>
           </li>
         </Router>);
 
@@ -99,6 +132,15 @@ class App extends Component {
         <div>
         Playlist:
         { listSongs }
+        <button onClick={() => this.getSongs()}>
+          Refresh Playlist
+        </button>
+        <button onClick={() => this.addSong()}>
+          Add Song
+        </button>
+        <button onClick={() => this.removeSong()}>
+          Remove Song
+        </button>
         </div>
       </div>
     );
