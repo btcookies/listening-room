@@ -16,20 +16,14 @@ class App extends Component {
         name: 'Not Checked',
         image: ''
       },
-      playlist: {
-        name: 'Current Playlist',
-        content: [{"songName": "Crew",
-                   "url": "https://open.spotify.com/track/3jEtESxn2ngF25DMD6vbBg?si=omRx4yCdSI2oHjItqbfACw"},
-                  {"songName": "Lost In Japan",
-                   "url": "https://open.spotify.com/track/6WBTeFDEfAJbaSUUc1V1xQ?si=oFCUXZYBSX-5xRfhMu5KTA"},
-                  {"songName": "1999 WILDFIRE",
-                   "url": "https://open.spotify.com/track/1t4pPnbkOjzoA5RvsDjvUU?si=utREqrTmTVum9kKuAQQz0g"}]
-      },
+      playlist: []
     };
     if (params.access_token) {
       spotifyWebApi.setAccessToken(params.access_token);
     }
   }
+
+  // get spotify credential params to prove premium access
   getHashParams() {
     var hashParams = {};
     var e, r = /([^&;=]+)=?([^&;]*)/g,
@@ -39,6 +33,9 @@ class App extends Component {
     }
     return hashParams;
   }
+
+  // gets the currently playing song title and image for display on
+  // front page
   getNowPlaying() {
     spotifyWebApi.getMyCurrentPlaybackState()
       .then((response) => {
@@ -51,48 +48,35 @@ class App extends Component {
       })
   }
 
-  updatePlaylist() {
-    const name = prompt("What's the name of the song you are adding?", "<insert title here>");
-    const code = prompt("Copy and paste the Song Link from Spotify into this field", "<insert code here>");
-    let canContinue = name !== null && code !== null ? true : false;
+  // getting list of tracks in a playlist using spotifyWebApi
+  getPlaylistTracksAPI() {
+    this.setState({playlist: []});
+    spotifyWebApi.getPlaylistTracks("5tx4WPl98jpQUZ6X19S1Wo")
+      .then((response) => {
+        response.items.map((object) =>
+          this.setState({
+            playlist:
+            [...this.state.playlist,
+              {"songName": object.track.name,
+              "url": object.track.external_urls.spotify,
+              votes: 0}]
+          }))
 
-    // jquery call to get HTML object from string
-    //
-    // REVISIT THIS TO SEE IF WE CAN GET COOL EMBEDDED PLAYLIST
-    //
-    // const embedHTML = $(code);
-
-
-    if (!canContinue) {
-      alert("Sorry, you've entered invalid input[s]. Please try again.");
-    } else {
-      console.log("This is the name value stored: " + name + "\n");
-      console.log("This is the embed code stored: " + code + "\n");
-      this.setState({
-        playlist: {
-          content: [...this.state.playlist.content, {"songName": name, "url": code}]
-        }
-      });
-      console.log(this.state.playlist.content);
-    }
+      })
   }
+
+  // set refresh time for 1 second to keep playlist updated
+  componentDidMount() {
+    this.interval = setInterval(() => this.getPlaylistTracksAPI(), 1000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
+  }
+
   render() {
 
-    // const playlist = [{"songName": "Crew",
-    //                    "embed": <iframe src="https://open.spotify.com/embed/track/15EPc80XuFrb2LmOzGjuRg"
-    //                                     width="300" height="380" frameborder="0"
-    //                                     allowtransparency="true" allow="encrypted-media"></iframe>},
-    //                   {"songName": "Lost In Japan",
-    //                    "embed": <iframe src="https://open.spotify.com/embed/track/79esEXlqqmq0GPz0xQSZTV"
-    //                                     width="300" height="380" frameborder="0"
-    //                                     allowtransparency="true" allow="encrypted-media"></iframe>},
-    //                   {"songName": "1999 WILDFIRE",
-    //                    "embed": <iframe src="https://open.spotify.com/embed/track/1t4pPnbkOjzoA5RvsDjvUU"
-    //                                     width="300" height="380" frameborder="0"
-    //                                     allowtransparency="true" allow="encrypted-media"></iframe>}
-    //
-    //                   ];
-    let listSongs = this.state.playlist.content.map((song) =>
+    let listSongs = this.state.playlist.map((song) =>
         <Router key={song.songName}>
           <li>
             <a href={song.url}> { song.songName }</a>
@@ -114,11 +98,6 @@ class App extends Component {
         <div>
         Playlist:
         { listSongs }
-        </div>
-        <div>
-        <button onClick={() => this.updatePlaylist()}>
-          Add To Playlist
-        </button>
         </div>
       </div>
     );
