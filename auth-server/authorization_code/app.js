@@ -15,8 +15,9 @@ var cookieParser = require('cookie-parser');
 
 var client_id = '72179201cdaa44f29505d3aa7c27cd3c'; // Your client id
 var client_secret = 'c22d9f9da3c54358bdbbd23253ec553e'; // Your secret
-var redirect_uri = 'http://localhost:8888/callback'; // Your redirect uri
+var redirect_uri = 'http://localhost:8888/callback/'; // Your redirect uri
 
+console.log("We have set client id, client secret, redirect uri");
 /**
  * Generates a random string containing numbers and letters
  * @param  {number} length The length of the string
@@ -45,9 +46,9 @@ app.get('/login', function(req, res) {
   var state = generateRandomString(16);
   res.cookie(stateKey, state);
 
-  // your application requests authorization
-  var scope = 'user-read-private user-read-email user-read-playback-state user-read-top'
-              + 'user-modify-playback-state playlist-modify-private playlist-read-private playlist-modify-public';
+  // your application requests authorization  playlist-modify-private playlist-read-private playlist-modify-public
+  var scope = 'user-read-private user-read-email user-read-playback-state playlist-modify-public'
+              + ' playlist-read-collaborative';
   res.redirect('https://accounts.spotify.com/authorize?' +
     querystring.stringify({
       response_type: 'code',
@@ -57,6 +58,8 @@ app.get('/login', function(req, res) {
       state: state
     }));
 });
+
+console.log("past res.redirect call to ask for authorization.")
 
 app.get('/callback', function(req, res) {
 

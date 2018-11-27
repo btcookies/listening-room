@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import './App.css';
 import Spotify from 'spotify-web-api-js';
-import $ from 'jquery';
 
 
 const spotifyWebApi = new Spotify();
@@ -18,7 +17,7 @@ class App extends Component {
         image: ''
       },
       playlist: {
-        id: "0NXu9CZfJUBbXnd5SE9EJW",
+        id: "0NXu9CZfJUBbXnd5SE9EJW", // change this to a playlist you own
         content: []
       }
     };
