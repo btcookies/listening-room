@@ -97,13 +97,13 @@ class App extends Component {
   }
 
   // set refresh time for 1 second to keep playlist updated
-  componentDidMount() {
-    this.interval = setInterval(() => this.getSongs(), 1000);
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.interval);
-  }
+  // componentDidMount() {
+  //   this.interval = setInterval(() => this.getSongs(), 1000);
+  // }
+  //
+  // componentWillUnmount() {
+  //   clearInterval(this.interval);
+  // }
 
   render() {
 
