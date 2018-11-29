@@ -113,6 +113,9 @@ class App extends Component {
             <button>
               upvote
             </button>
+            <button>
+              downvote
+            </button>
           </li>
         </Router>);
 
