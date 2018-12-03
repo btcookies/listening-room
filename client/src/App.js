@@ -134,7 +134,6 @@ class App extends Component {
             { song.votes }
             <button onClick={() =>
               {song.votes++;
-              this.sortSongs();
               this.refreshSongs();}}>
               upvote
             </button>
