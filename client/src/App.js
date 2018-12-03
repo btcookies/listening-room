@@ -24,7 +24,7 @@ class App extends Component {
       playlistContent: []
     };
     if (params.access_token) {
-      spotifyWebApi.setAccessToken("BQCPIfb3EUvrscNZOLpaivRwPV_A97NxiXoctgW2cc-y9fozrNlGWQ5QJDrIQVSgvSnC8Dcr4HHLxI68HCbf5UJ7tdQhrYw9E8qc4wPx8WqcILK1QOW0pyhRuqRx0JAPurnh0tfuLsZpxQzvyRZ5CwiM-Cn4kOdVPo01DbIj3aaC6ZS37VJr4vsK9IMIPWRFNmf1rCjlF135nc94BYgEd6Rb9vYhMA");
+      spotifyWebApi.setAccessToken(params.access_token);
     }
   }
 
