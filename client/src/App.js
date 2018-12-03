@@ -67,6 +67,7 @@ class App extends Component {
                           "url": object.track.external_urls.spotify,
                           "votes": 0})
         );
+        // get old vote count so we don't overwrite on the refresh
         this.state.playlistContent.forEach(function(oldObj) {
           songsArr.forEach(function(newObj) {
             if (oldObj.id === newObj.id) {
@@ -75,12 +76,20 @@ class App extends Component {
             }
           })
         });
+        // sort songs by number of votes
+        songsArr.sort((a,b) => b.votes - a.votes);
+        // loop through sorted songs and reorder playlist in Spotify
+
         this.setState((state) => {
           return {
             ...state,
             playlistContent: songsArr
           }
         });
+        const uriList = songsArr.map((obj) => obj.id);
+
+        console.log("List of URI's to be reordered: ", uriList);
+        spotifyWebApi.replaceTracksInPlaylist(this.state.playlistId, uriList);
       })
 
   }
@@ -111,6 +120,8 @@ class App extends Component {
   }
 
   componentDidMount() {
+    const params = this.getHashParams();
+    console.log("Current access token: ", params.access_token);
     this.refreshSongs();
   }
 
@@ -123,6 +134,7 @@ class App extends Component {
             { song.votes }
             <button onClick={() =>
               {song.votes++;
+              this.sortSongs();
               this.refreshSongs();}}>
               upvote
             </button>
