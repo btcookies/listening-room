@@ -94,9 +94,7 @@ class App extends Component {
     } else {
       console.log("Grabbed song uri: " + songURI);
       spotifyWebApi.addTracksToPlaylist(this.state.playlistId, [songURI])
-      .then((object) => this.refreshSongs()/* rerender list*/)
-
-      //spotifyWebApi.
+      .then((object) => this.refreshSongs())
     }
   }
 
@@ -108,8 +106,7 @@ class App extends Component {
     } else {
       console.log("Grabbed song uri: " + songURI);
       spotifyWebApi.removeTracksFromPlaylist(this.state.playlistId, [songURI])
-      .then((object) => this.refreshSongs()/* rerender list*/)
-
+      .then((object) => this.refreshSongs())
     }
   }
 
@@ -128,6 +125,11 @@ class App extends Component {
               {song.votes++;
               this.refreshSongs();}}>
               upvote
+            </button>
+            <button onClick={() =>
+              {song.votes--;
+              this.refreshSongs();}}>
+              downvote
             </button>
           </li>
         </Router>)}                                                                                   );
