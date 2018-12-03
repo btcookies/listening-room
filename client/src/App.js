@@ -10,16 +10,18 @@ class App extends Component {
   constructor(){
     super();
     const params = this.getHashParams();
+
+    let curSongs = [];
+    // get songs from playlist
+
     this.state = {
       loggedIn: params.access_token ? true : false,
       nowPlaying: {
         name: 'Not Checked',
         image: ''
       },
-      playlist: {
-        id: "0NXu9CZfJUBbXnd5SE9EJW", // change this to a playlist you own
-        content: []
-      }
+      playlistId: "0NXu9CZfJUBbXnd5SE9EJW", // change this to a playlist you own
+      playlistContent: []
     };
     if (params.access_token) {
       spotifyWebApi.setAccessToken(params.access_token);
@@ -52,34 +54,49 @@ class App extends Component {
   }
 
   // getting list of tracks in a playlist using spotifyWebApi
-  getSongs() {
-    const playlistURI = this.state.playlist.id;
-    this.setState({playlist: { id: playlistURI, content: []}});
+  refreshSongs() {
+    const playlistURI = this.state.playlistId;
+    let newState = Object.assign({}, this.state);
+    let songsArr = [];
+    //this.setState({playlist: { id: playlistURI, content: []}});
     spotifyWebApi.getPlaylistTracks(playlistURI)
       .then((response) => {
         response.items.map((object) =>
-          this.setState({
-            playlist: {
-              id: playlistURI,
-              content:
-                [...this.state.playlist.content,
-                {"songName": object.track.name,
-                "url": object.track.external_urls.spotify,
-                votes: 0}]
+          songsArr.push({"id": object.track.uri,
+                          "name": object.track.name,
+                          "url": object.track.external_urls.spotify,
+                          "votes": 0})
+        );
+        this.state.playlistContent.forEach(function(oldObj) {
+          songsArr.forEach(function(newObj) {
+            if (oldObj.id === newObj.id) {
+              newObj.votes = oldObj.votes;
+              return;
             }
-          }))
+          })
+        });
+        this.setState((state) => {
+          return {
+            ...state,
+            playlistContent: songsArr
+          }
+        });
       })
+
   }
 
   // adds song to playlist identified in the this.state.playlist.id field
   addSong() {
     const songURI = prompt("What song would you like to add? Paste the uri here.", "");
+    const songName = prompt("What song would you like to add? Paste the uri here.", "");
     if (songURI === null) {
       alert("Sorry, you did not input a valid uri. Please try again.");
     } else {
       console.log("Grabbed song uri: " + songURI);
-      spotifyWebApi.addTracksToPlaylist(this.state.playlist.id, [songURI])
-      .then((object) => console.log(object)/* do nothing*/)
+      spotifyWebApi.addTracksToPlaylist(this.state.playlistId, [songURI])
+      .then((object) => this.refreshSongs()/* rerender list*/)
+
+      //spotifyWebApi.
     }
   }
 
@@ -90,31 +107,30 @@ class App extends Component {
       alert("Sorry, you did not input a valid uri. Please try again.");
     } else {
       console.log("Grabbed song uri: " + songURI);
-      spotifyWebApi.removeTracksFromPlaylist(this.state.playlist.id, [songURI])
-      .then((object) => console.log(object)/* do nothing*/)
+      spotifyWebApi.removeTracksFromPlaylist(this.state.playlistId, [songURI])
+      .then((object) => this.refreshSongs()/* rerender list*/)
+
     }
   }
 
-  // set refresh time for 1 second to keep playlist updated
-  // componentDidMount() {
-  //   this.interval = setInterval(() => this.getSongs(), 1000);
-  // }
-  //
-  // componentWillUnmount() {
-  //   clearInterval(this.interval);
-  // }
+  componentDidMount() {
+    this.refreshSongs();
+  }
 
   render() {
 
-    let listSongs = this.state.playlist.content.map((song) =>
-        <Router key={song.songName}>
+    let listSongs = this.state.playlistContent.map((song) =>{
+        return(<Router key={song.id}>
           <li>
-            <a href={song.url}> { song.songName }</a>
-            <button>
+            <a href={ song.url }> { song.name }</a>
+            { song.votes }
+            <button onClick={() =>
+              {song.votes++;
+              this.refreshSongs();}}>
               upvote
             </button>
           </li>
-        </Router>);
+        </Router>)}                                                                                   );
 
     return (
       <div className="App">
@@ -130,10 +146,9 @@ class App extends Component {
         </button>
         <div>
         Playlist:
-        { listSongs }
-        <button onClick={() => this.getSongs()}>
-          Refresh Playlist
-        </button>
+        <ul>
+          { listSongs }
+        </ul>
         <button onClick={() => this.addSong()}>
           Add Song
         </button>
