@@ -132,7 +132,8 @@ class App extends Component {
               downvote
             </button>
           </li>
-        </Router>)}                                                                                   );
+        </Router>)}
+      );
 
     return (
       <div className="App">
