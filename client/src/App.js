@@ -56,14 +56,14 @@ class App extends Component {
   // getting list of tracks in a playlist using spotifyWebApi
   refreshSongs() {
     const playlistURI = this.state.playlistId;
-    let newState = Object.assign({}, this.state);
     let songsArr = [];
-    //this.setState({playlist: { id: playlistURI, content: []}});
+    // get array of playlist song information and store in tmp var songsArr
     spotifyWebApi.getPlaylistTracks(playlistURI)
       .then((response) => {
         response.items.map((object) =>
           songsArr.push({"id": object.track.uri,
                           "name": object.track.name,
+                          "artist": object.track.artists[0].name,
                           "url": object.track.external_urls.spotify,
                           "votes": 0})
         );
@@ -79,17 +79,18 @@ class App extends Component {
         // sort songs by number of votes
         songsArr.sort((a,b) => b.votes - a.votes);
         // loop through sorted songs and reorder playlist in Spotify
+        const uriList = songsArr.map((obj) => obj.id);
 
+        console.log("List of URI's to be reordered: ", uriList);
+        spotifyWebApi.replaceTracksInPlaylist(this.state.playlistId, uriList);
+        // update state
         this.setState((state) => {
           return {
             ...state,
             playlistContent: songsArr
           }
         });
-        const uriList = songsArr.map((obj) => obj.id);
 
-        console.log("List of URI's to be reordered: ", uriList);
-        spotifyWebApi.replaceTracksInPlaylist(this.state.playlistId, uriList);
       })
 
   }
@@ -97,7 +98,6 @@ class App extends Component {
   // adds song to playlist identified in the this.state.playlist.id field
   addSong() {
     const songURI = prompt("What song would you like to add? Paste the uri here.", "");
-    const songName = prompt("What song would you like to add? Paste the uri here.", "");
     if (songURI === null) {
       alert("Sorry, you did not input a valid uri. Please try again.");
     } else {
@@ -130,11 +130,10 @@ class App extends Component {
     let listSongs = this.state.playlistContent.map((song) =>{
         return(<Router key={song.id}>
           <li>
-            <a href={ song.url }> { song.name }</a>
+            <a href={ song.url }> { song.name + " - " + song.artist }</a>
             { song.votes }
             <button onClick={() =>
               {song.votes++;
-              this.sortSongs();
               this.refreshSongs();}}>
               upvote
             </button>
