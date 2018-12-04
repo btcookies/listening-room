@@ -121,6 +121,7 @@ class App extends Component {
 
   componentDidMount() {
     const params = this.getHashParams();
+    console.log("Params contains: ", params.access_token);
     console.log("Current access token: ", params.access_token);
     this.refreshSongs();
   }
@@ -151,13 +152,13 @@ class App extends Component {
         <a href='http://localhost:8888'>
           <button>Login With Spotify</button>
         </a>
-        <div>Now Playing: { this.state.nowPlaying.name } </div>
+{/*        <div>Now Playing: { this.state.nowPlaying.name } </div>
         <div>
           <img src= { this.state.nowPlaying.image } style={{width: 100}}/>
         </div>
         <button onClick={() => this.getNowPlaying()}>
           Check Now Playing
-        </button>
+        </button>*/}
         <div>
         Playlist:
         <ul>
