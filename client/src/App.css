@@ -1,5 +1,22 @@
-.App {
-  text-align: left;
+body{
+  background-image: url(https://cdn.hipwallpaper.com/i/94/64/lrBA1H.jpg);
+}
+
+.arrange{
+  width: 200%;
+  padding-left: 470px;
+}
+
+.check{
+  width: 15%;
+}
+
+.login:hover{
+background: #282c34;
+}
+
+.check:hover{
+background: #282c34;
 }
 
 .App-logo {
@@ -18,6 +35,9 @@
   color: white;
 }
 
+.section{
+  text-align: center;
+}
 .App-link {
   color: #61dafb;
 }
@@ -31,37 +51,71 @@
   }
 }
 
-div, button {
+.center{
+  text-align: center;
+}
+
+.content {
+  vertical-align: bottom;
+  text-align: left;
+  padding-left: 100px;
+}
+
+a{
+  color: black;
+}
+
+div{
   margin: 15px;
+  white-space: normal;
+}
+
+button {
+  margin: 10px;
+  width: 8%;
+  padding: 5px;
+  background: grey;
+  color: white;
+  font-size: 11px;
+  border: 1px solid grey;
+  text-align: center;
+  border-left: none;
+  cursor: pointer;
 }
 
 {
   box-sizing: border-box;
 }
 
+.format{
+padding-left: 260px;
+}
+
 /* Style the search field */
-form.example input[type=text] {
+input[type=text] {
+  align-items: center;
   padding: 10px;
   font-size: 17px;
-  border: 1px solid grey;
+  border: 1px solid darkgrey;
   width: 80%;
   background: #f1f1f1;
 }
 
-/* Style the submit button */
-form.example button {
-  width: 20%;
-  padding: 10px;
-  background: #2196F3;
-  color: white;
-  font-size: 17px;
-  border: 1px solid grey;
-  border-left: none; /* Prevent double borders */
-  cursor: pointer;
+.alterplaylist:hover{
+  background: #282c34;
 }
 
-form.example button:hover {
-  background: #0b7dda;
+.yes:hover{
+  background: #282c34;
+}
+
+.no:hover {
+  background: #282c34;
+}
+
+.albumcover{
+  padding-left: 590px;
+  padding-bottom: 10px;
 }
 
 /* Clear floats */

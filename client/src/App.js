@@ -19,7 +19,7 @@ class App extends Component {
         name: 'Not Checked',
         image: ''
       },
-      playlistId: "20p9eUP6EZrxy22XqdegGf", // change this to a playlist you own
+      playlistId: "7g7QlTHxIdhfIT3EiWMooi", // change this to a playlist you own
       playlistContent: []
     };
     if (params.access_token) {
@@ -173,12 +173,12 @@ class App extends Component {
     let listSongs = this.state.playlistContent.map((song) =>{
         return(<Router key={song.id}>
           <li>
-            <button onClick={() =>
+            <button className="yes" onClick={() =>
               {song.votes++;
               this.refreshSongs();}}>
               upvote
             </button>
-            <button onClick={() =>
+            <button className="no" onClick={() =>
               {song.votes--;
               this.refreshSongs();}}>
               downvote
@@ -190,16 +190,19 @@ class App extends Component {
       );
 
     return (
+      <body>
       <div className="App">
+      <div className="arrange">
         <a href='http://localhost:8888'>
-          <button>Login With Spotify</button>
+          <button className="login">Login With Spotify</button>
         </a>
-        <button onClick={() => {this.choosePlaylist();}}>Choose Playlist</button>
-        <div>Now Playing: { this.state.nowPlaying.name } </div>
-        <div>
-          <img src= { this.state.nowPlaying.image } style={{width: 100}}/>
+        <button className="login" onClick={() => {this.choosePlaylist();}}>Choose Playlist</button>
         </div>
-        <div>
+        <div className = "center">Now Playing: { this.state.nowPlaying.name } </div>
+        <div className="albumcover">
+          <img src= { this.state.nowPlaying.image } style={{width: 160}}/>
+        </div>
+        <div className="format">
         <form id="searchform" className="example" action="action_page.php" onSubmit= {(e) => {
           e.preventDefault();
           var x = document.getElementById("searchform");
@@ -219,7 +222,7 @@ class App extends Component {
           <input type="text" placeholder="Enter song name you would like to add...">
           </input>
         </form>
-        <div>
+        <div className="content">
         Playlist:
         <ul>
           { listSongs }
@@ -227,6 +230,7 @@ class App extends Component {
         </div>
         </div>
       </div>
+      </body>
     );
   }
 }
