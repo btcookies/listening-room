@@ -20,12 +20,14 @@ class App extends Component {
         name: 'Not Checked',
         image: ''
       },
-      playlistId: "4gwYTkpnORezJqVgfVZ5Dx", // change this to a playlist you own
+      playlistId: "20p9eUP6EZrxy22XqdegGf", // change this to a playlist you own
       playlistContent: []
     };
     if (params.access_token) {
       spotifyWebApi.setAccessToken(params.access_token);
     }
+
+    this.getNowPlaying = this.getNowPlaying.bind(this);
   }
 
   // get spotify credential params to prove premium access
@@ -50,7 +52,14 @@ class App extends Component {
             image: response.item.album.images[0].url
           }
         })
-      })
+        spotifyWebApi.getPlaylistTracks(this.state.playlistId).then((object) => {
+          object.items.forEach((item) => {
+            if (item.track.uri === response.item.uri) {
+              this.removeSong(item.track.uri);
+            }
+          })
+        })
+      });
   }
 
   // getting list of tracks in a playlist using spotifyWebApi
@@ -124,6 +133,7 @@ class App extends Component {
     const params = this.getHashParams();
     console.log("Current access token: ", params.access_token);
     this.refreshSongs();
+    setInterval(this.getNowPlaying,1000);
   }
 
   render() {
@@ -143,6 +153,7 @@ class App extends Component {
               this.refreshSongs();}}>
               downvote
             </button>
+            <button onClick= {() => { this.removeSong(song.id) }}>Remove Song</button>
           </li>
         </Router>)}
       );
@@ -156,42 +167,32 @@ class App extends Component {
         <div>
           <img src= { this.state.nowPlaying.image } style={{width: 100}}/>
         </div>
-        <button onClick={() => this.getNowPlaying()}>
-          Check Now Playing
-        </button>
         <div>
-        <form id="searchform" className="example" action="action_page.php">
-          <input type="text" placeholder="Enter song name you would like to add or remove...">
+        <form id="searchform" className="example" action="action_page.php" onSubmit= {(e) => {
+          e.preventDefault();
+          var x = document.getElementById("searchform");
+          var text = "";
+          var i;
+          for (i = 0; i < x.length ;i++) {
+              text += x.elements[i].value + " ";
+          }
+          spotifyWebApi.searchTracks(text).then((object) => {
+            if (object.tracks.total !== 0) {
+            this.addSong(object.tracks.items[0].uri)
+          }else {
+            alert("No songs found.");
+          }}
+        )
+        }}>
+          <input type="text" placeholder="Enter song name you would like to add...">
           </input>
         </form>
         <div>
-        <button onClick= {() => {
-          var x = document.getElementById("searchform");
-          var text = "";
-          var i;
-          for (i = 0; i < x.length ;i++) {
-              text += x.elements[i].value + " ";
-          }
-          spotifyWebApi.searchTracks(text).then((object) =>
-            this.addSong(object.tracks.items[0].uri)
-        )
-        }}>Add Song</button>
-        <button onClick= {() => {
-          var x = document.getElementById("searchform");
-          var text = "";
-          var i;
-          for (i = 0; i < x.length ;i++) {
-              text += x.elements[i].value + " ";
-          }
-          spotifyWebApi.searchTracks(text).then((object) =>
-            this.removeSong(object.tracks.items[0].uri)
-        )
-      }}>Remove Song</button>
-        </div>
         Playlist:
         <ul>
           { listSongs }
         </ul>
+        </div>
         </div>
       </div>
     );
