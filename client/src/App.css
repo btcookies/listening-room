@@ -51,6 +51,10 @@ background: #282c34;
   }
 }
 
+.title{
+  padding-left: 260px;
+  text-decoration: underline;
+}
 .center{
   text-align: center;
 }

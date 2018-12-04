@@ -198,10 +198,10 @@ class App extends Component {
         </a>
         <button className="login" onClick={() => {this.choosePlaylist();}}>Choose Playlist</button>
         </div>
-        <div className = "center">Now Playing: { this.state.nowPlaying.name } </div>
         <div className="albumcover">
           <img src= { this.state.nowPlaying.image } style={{width: 160}}/>
         </div>
+          <div className = "center">Now Playing: { this.state.nowPlaying.name } </div>
         <div className="format">
         <form id="searchform" className="example" action="action_page.php" onSubmit= {(e) => {
           e.preventDefault();
@@ -223,7 +223,7 @@ class App extends Component {
           </input>
         </form>
         <div className="content">
-        Playlist:
+        <h5 className="title"> Playlist</h5>
         <ul>
           { listSongs }
         </ul>
