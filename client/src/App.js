@@ -19,7 +19,7 @@ class App extends Component {
         name: 'Not Checked',
         image: ''
       },
-      playlistId: "0NXu9CZfJUBbXnd5SE9EJW", // change this to a playlist you own
+      playlistId: "20p9eUP6EZrxy22XqdegGf", // change this to a playlist you own
       playlistContent: []
     };
     if (params.access_token) {
@@ -45,22 +45,28 @@ class App extends Component {
   getNowPlaying() {
     spotifyWebApi.getMyCurrentPlaybackState()
       .then((response) => {
-        this.setState({
-          ...this.state,
-          nowPlaying: {
-            name: response.item.name,
-            image: response.item.album.images[0].url
-          }
-        })
-        spotifyWebApi.getPlaylistTracks(this.state.playlistId).then((object) => {
-          object.items.forEach((item) => {
-            if (item.track.uri === response.item.uri) {
-              this.removeSong(item.track.uri);
+        if (response.item !== null) {
+          this.setState({
+            nowPlaying: {
+              name: response.item.name,
+              image: response.item.album.images[0].url
             }
           })
-        })
-      });
-  }
+          spotifyWebApi.getPlaylistTracks(this.state.playlistId).then((object) => {
+            object.items.forEach((item) => {
+              if (item.track.uri === response.item.uri) {
+                this.removeSong(item.track.uri);
+              }
+            })
+          })
+        } else {
+          this.setState({
+            nowPlaying: {
+              name: "No Song Currently Playing",
+              image: null
+            }
+          })
+        }})}
 
   // getting list of tracks in a playlist using spotifyWebApi
   refreshSongs() {
@@ -115,8 +121,19 @@ class App extends Component {
   // adds song to playlist identified in the this.state.playlist.id field
   addSong(uri) {
     console.log("Grabbed song uri: " + uri);
-    spotifyWebApi.addTracksToPlaylist(this.state.playlistId,[uri])
-    .then((object) => this.refreshSongs())
+    spotifyWebApi.getPlaylistTracks(this.state.playlistId).then((object) => {
+      var x = false;
+      object.items.forEach((item) => {
+        if (item.track.uri === uri) {
+          x = true;
+          alert("Song already in playlist!");
+        }
+      })
+      if (x === false) {
+        spotifyWebApi.addTracksToPlaylist(this.state.playlistId,[uri])
+        .then((object) => this.refreshSongs())
+      }
+    })
   }
 
   removeSong(uri) {
@@ -156,8 +173,6 @@ class App extends Component {
     let listSongs = this.state.playlistContent.map((song) =>{
         return(<Router key={song.id}>
           <li>
-            <a href={ song.url }> { song.name + " - " + song.artist }</a>
-            { "     " + song.votes }
             <button onClick={() =>
               {song.votes++;
               this.refreshSongs();}}>
@@ -168,7 +183,8 @@ class App extends Component {
               this.refreshSongs();}}>
               downvote
             </button>
-            <button onClick= {() => this.removeSong(song.id) }>Remove Song</button>
+            { "     " + song.votes }
+            <a href={ song.url }> { song.name + " - " + song.artist }</a>
           </li>
         </Router>)}
       );
