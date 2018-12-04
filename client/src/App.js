@@ -173,6 +173,7 @@ class App extends Component {
     let listSongs = this.state.playlistContent.map((song) =>{
         return(<Router key={song.id}>
           <li>
+          { "     " + song.votes }
             <button className="yes" onClick={() =>
               {song.votes++;
               this.refreshSongs();}}>
@@ -183,7 +184,7 @@ class App extends Component {
               this.refreshSongs();}}>
               downvote
             </button>
-            { "     " + song.votes }
+
             <a href={ song.url }> { song.name + " - " + song.artist }</a>
           </li>
         </Router>)}
