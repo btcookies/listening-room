@@ -6,16 +6,19 @@
  * For more information, read
  * https://developer.spotify.com/web-api/authorization-guide/#authorization_code_flow
  */
+ const express = require('express');
+ const querystring = require('querystring');
+ const request = require('request');
 
-var express = require('express'); // Express web server framework
-var request = require('request'); // "Request" library
-var cors = require('cors');
-var querystring = require('querystring');
-var cookieParser = require('cookie-parser');
+ const Router = express.Router;
+ const AppConfig = require('../config/app');
+ const AuthConfig = require('../config/auth');
 
-var client_id = '72179201cdaa44f29505d3aa7c27cd3c'; // Your client id
-var client_secret = 'c22d9f9da3c54358bdbbd23253ec553e'; // Your secret
-var redirect_uri = 'http://localhost:8888/callback/'; // Your redirect uri
+ const redirect_uri = `${AppConfig.HOST}/auth/callback`;
+ const client_id = AuthConfig.CLIENT_ID;
+ const client_secret = AuthConfig.CLIENT_SECRET;
+
+ let auth = Router();
 
 console.log("We have set client id, client secret, redirect uri");
 /**
@@ -138,14 +141,30 @@ app.get('/refresh_token', function(req, res) {
   };
 
   request.post(authOptions, function(error, response, body) {
-    if (!error && response.statusCode === 200) {
-      var access_token = body.access_token;
-      res.send({
-        'access_token': access_token
-      });
-    }
-  });
+      if (!error && response.statusCode === 200) {
+        var access_token = body.access_token, expires_in = body.expires_in;
+
+        res.setHeader('Content-Type', 'application/json');
+        res.send(
+          JSON.stringify({
+            access_token: access_token,
+            expires_in: expires_in
+          })
+        );
+      } else {
+        res.setHeader('Content-Type', 'application/json');
+        res.send(JSON.stringify({ access_token: '', expires_in: '' }));
+      }
+    });
+  } else {
+    res.setHeader('Content-Type', 'application/json');
+    res.send(JSON.stringify({ access_token: '', expires_in: '' }));
+  }
 });
+
+
 
 console.log('Listening on 8888');
 app.listen(8888);
+
+module.exports = auth;
