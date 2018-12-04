@@ -125,25 +125,23 @@ class App extends Component {
     .then((object) => this.refreshSongs())
   }
 
-  // choosePlaylist() {
-  //   let input = prompt("Which playlist will be used in this listening room?", "");
-  //   if (input === null) {
-  //     alert("You have inserted an invalid uri. Please try again.");
-  //   } else {
-  //     // playlist uri 22 characters long, follows spotify:user:<userid>:playlist:<uri> struct
-  //     let arr = input.split(':');
-  //     let uri = arr[4];
-  //     console.log("Parsed uri is: ", uri);
-  //     if (uri !== undefined && uri.length === 22) {
-  //       this.setState({
-  //           playlistId: uri
-  //         });
-  //       //this.refreshSongs();
-  //     } else {
-  //       alert("You have inserted an invalid uri. Please try again.");
-  //     }
-  //   }
-  // }
+  choosePlaylist() {
+    let input = prompt("Which playlist will be used in this listening room?", "");
+    if (input === null) {
+      alert("You have inserted an invalid uri. Please try again.");
+    } else {
+      // playlist uri 22 characters long, follows spotify:user:<userid>:playlist:<uri> struct
+      let arr = input.split(':');
+      let uri = arr[4];
+      console.log("Parsed uri is: ", uri);
+      if (uri !== undefined && uri.length === 22) {
+        this.setState({ playlistId: uri }, () => this.refreshSongs());
+        //this.refreshSongs();
+      } else {
+        alert("You have inserted an invalid uri. Please try again.");
+      }
+    }
+  }
 
   componentDidMount() {
     const params = this.getHashParams();
@@ -180,7 +178,7 @@ class App extends Component {
         <a href='http://localhost:8888'>
           <button>Login With Spotify</button>
         </a>
-        {/*<button onClick={() => {this.choosePlaylist();}}>Choose Playlist</button>*/}
+        <button onClick={() => {this.choosePlaylist();}}>Choose Playlist</button>
         <div>Now Playing: { this.state.nowPlaying.name } </div>
         <div>
           <img src= { this.state.nowPlaying.image } style={{width: 100}}/>
