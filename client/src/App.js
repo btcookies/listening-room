@@ -3,16 +3,15 @@ import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import './App.css';
 import Spotify from 'spotify-web-api-js';
 
-
+// api wrapper object
 const spotifyWebApi = new Spotify();
+// vote total that results in a song deleted off the playlist
+const DELETE_THRESHOLD = -5;
 
 class App extends Component {
   constructor(){
     super();
     const params = this.getHashParams();
-
-    let curSongs = [];
-    // get songs from playlist
 
     this.state = {
       loggedIn: params.access_token ? true : false,
@@ -20,12 +19,14 @@ class App extends Component {
         name: 'Not Checked',
         image: ''
       },
-      playlistId: "4gwYTkpnORezJqVgfVZ5Dx", // change this to a playlist you own
+      playlistId: "0NXu9CZfJUBbXnd5SE9EJW", // change this to a playlist you own
       playlistContent: []
     };
     if (params.access_token) {
       spotifyWebApi.setAccessToken(params.access_token);
     }
+
+    this.getNowPlaying = this.getNowPlaying.bind(this);
   }
 
   // get spotify credential params to prove premium access
@@ -45,12 +46,20 @@ class App extends Component {
     spotifyWebApi.getMyCurrentPlaybackState()
       .then((response) => {
         this.setState({
+          ...this.state,
           nowPlaying: {
             name: response.item.name,
             image: response.item.album.images[0].url
           }
         })
-      })
+        spotifyWebApi.getPlaylistTracks(this.state.playlistId).then((object) => {
+          object.items.forEach((item) => {
+            if (item.track.uri === response.item.uri) {
+              this.removeSong(item.track.uri);
+            }
+          })
+        })
+      });
   }
 
   // getting list of tracks in a playlist using spotifyWebApi
@@ -78,6 +87,14 @@ class App extends Component {
         });
         // sort songs by number of votes
         songsArr.sort((a,b) => b.votes - a.votes);
+
+        // delete song if it receives too many downvotes
+        for (let i=0; i < songsArr.length; i++) {
+          if (songsArr[i].votes <= DELETE_THRESHOLD) {
+            songsArr.splice(i,1);
+          }
+        }
+
         // loop through sorted songs and reorder playlist in Spotify
         const uriList = songsArr.map((obj) => obj.id);
 
@@ -108,23 +125,32 @@ class App extends Component {
     .then((object) => this.refreshSongs())
   }
 
-  // removes song from playlist identified in the this.state.playlist.id field
-  //removeSong() {
-  //  const songURI = prompt("What song would you like to remove? Paste the uri here.", "");
-  //  if (songURI === null) {
-  //    alert("Sorry, you did not input a valid uri. Please try again.");
-  //  } else {
-  //    console.log("Grabbed song uri: " + songURI);
-  //    spotifyWebApi.removeTracksFromPlaylist(this.state.playlistId, [songURI])
-  //    .then((object) => this.refreshSongs())
-  //  }
-  //}
+  // choosePlaylist() {
+  //   let input = prompt("Which playlist will be used in this listening room?", "");
+  //   if (input === null) {
+  //     alert("You have inserted an invalid uri. Please try again.");
+  //   } else {
+  //     // playlist uri 22 characters long, follows spotify:user:<userid>:playlist:<uri> struct
+  //     let arr = input.split(':');
+  //     let uri = arr[4];
+  //     console.log("Parsed uri is: ", uri);
+  //     if (uri !== undefined && uri.length === 22) {
+  //       this.setState({
+  //           playlistId: uri
+  //         });
+  //       //this.refreshSongs();
+  //     } else {
+  //       alert("You have inserted an invalid uri. Please try again.");
+  //     }
+  //   }
+  // }
 
   componentDidMount() {
     const params = this.getHashParams();
     console.log("Params contains: ", params.access_token);
     console.log("Current access token: ", params.access_token);
     this.refreshSongs();
+    setInterval(this.getNowPlaying,1000);
   }
 
   render() {
@@ -144,6 +170,7 @@ class App extends Component {
               this.refreshSongs();}}>
               downvote
             </button>
+            <button onClick= {() => this.removeSong(song.id) }>Remove Song</button>
           </li>
         </Router>)}
       );
@@ -153,46 +180,37 @@ class App extends Component {
         <a href='http://localhost:8888'>
           <button>Login With Spotify</button>
         </a>
-{/*        <div>Now Playing: { this.state.nowPlaying.name } </div>
+        {/*<button onClick={() => {this.choosePlaylist();}}>Choose Playlist</button>*/}
+        <div>Now Playing: { this.state.nowPlaying.name } </div>
         <div>
           <img src= { this.state.nowPlaying.image } style={{width: 100}}/>
         </div>
-        <button onClick={() => this.getNowPlaying()}>
-          Check Now Playing
-        </button>*/}
         <div>
-        <form id="searchform" className="example" action="action_page.php">
-          <input type="text" placeholder="Enter song name you would like to add or remove...">
+        <form id="searchform" className="example" action="action_page.php" onSubmit= {(e) => {
+          e.preventDefault();
+          var x = document.getElementById("searchform");
+          var text = "";
+          var i;
+          for (i = 0; i < x.length ;i++) {
+              text += x.elements[i].value + " ";
+          }
+          spotifyWebApi.searchTracks(text).then((object) => {
+            if (object.tracks.total !== 0) {
+            this.addSong(object.tracks.items[0].uri)
+          } else {
+            alert("No songs found.");
+          }}
+        )
+        }}>
+          <input type="text" placeholder="Enter song name you would like to add...">
           </input>
         </form>
         <div>
-        <button onClick= {() => {
-          var x = document.getElementById("searchform");
-          var text = "";
-          var i;
-          for (i = 0; i < x.length ;i++) {
-              text += x.elements[i].value + " ";
-          }
-          spotifyWebApi.searchTracks(text).then((object) =>
-            this.addSong(object.tracks.items[0].uri)
-        )
-        }}>Add Song</button>
-        <button onClick= {() => {
-          var x = document.getElementById("searchform");
-          var text = "";
-          var i;
-          for (i = 0; i < x.length ;i++) {
-              text += x.elements[i].value + " ";
-          }
-          spotifyWebApi.searchTracks(text).then((object) =>
-            this.removeSong(object.tracks.items[0].uri)
-        )
-      }}>Remove Song</button>
-        </div>
         Playlist:
         <ul>
           { listSongs }
         </ul>
+        </div>
         </div>
       </div>
     );
